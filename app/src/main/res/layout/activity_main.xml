@@ -21,11 +21,19 @@
 
         <Button
             android:id="@+id/btnAddItem"
+            style="@style/buttonAddItem"
             android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add item"/>
 
+        <Button
+
+            android:id="@+id/DEL"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete all"/>
 
     </LinearLayout>
 
