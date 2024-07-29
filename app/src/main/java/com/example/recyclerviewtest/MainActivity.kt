@@ -2,6 +2,7 @@ package com.example.recyclerviewtest
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,9 +25,21 @@ class MainActivity : AppCompatActivity() {
         val MyRecycler = findViewById<RecyclerView>(R.id.recyclerV)
         MyRecycler.layoutManager = LinearLayoutManager(this)
         val data = ArrayList<Item>()
-        data.add(Item("Basic"))
-        data.add(Item("Basic"))
-        data.add(Item("Basic"))
+        val db = DbHelper(this, null)
+        val cursor = db.getItems()
+        if (cursor.count == 0)
+        {
+            data.add(Item("ERROR"))
+        }
+        else
+        {
+            val infoColIndex = cursor.getColumnIndex(DbHelper.DbInfoCol)
+            while(cursor.moveToNext())
+            {
+                data.add(Item(cursor.getString(infoColIndex)))
+            }
+        }
+        cursor.close()
 
         val adapter = RecyclerAdapter(data)
         MyRecycler.adapter = adapter
@@ -34,12 +47,28 @@ class MainActivity : AppCompatActivity() {
 
         val btnAdd = findViewById<Button>(R.id.btnAddItem)
         btnAdd.setOnClickListener{
-            data.add(Item("nowy"))
+            val id = db.addItem(Item("Dodano z przycisku"))
+            val cursorA = db.getItem(id)
+            cursorA.moveToNext()
+
+            if (cursorA.count == 0)
+            {
+                data.add(Item("ERROR"))
+            }
+            else
+            {
+                val infoColIndex = cursorA.getColumnIndex(DbHelper.DbInfoCol)
+                data.add(Item(cursorA.getString(infoColIndex)))
+            }
             adapter.notifyItemInserted(data.size - 1)
         }
 
-
-
-
+        val btnDel = findViewById<Button>(R.id.DEL)
+        btnDel.setOnClickListener {
+            db.deleteAll()
+            data.clear()
+            adapter.notifyDataSetChanged()
+            db.close()
+        }
     }
 }
